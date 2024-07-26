@@ -7,12 +7,15 @@ set(CMAKE_BUILD_TYPE "Release") # force release build - COMMENT FOR DEBUGGING
 
 add_compile_options("-Wall" "-Wextra" "-Wpedantic") # enable more warnings
 
+find_package(FLANN REQUIRED)
+
 include_directories(${CMAKE_SOURCE_DIR}/libs/rapid/include 
-                    /usr/include/cairo)
+                    ${FLANN_INCLUDE_DIRS}
+                    ${CMAKE_SOURCE_DIR}/src/graphics)
 link_directories(${CMAKE_SOURCE_DIR}/libs/rapid/)
 
-file(GLOB sources src/*.cpp)
+file(GLOB sources src/*.cpp src/graphics/*.cpp)
 add_executable(${PROJECT_NAME} ${sources})
 
-target_link_libraries(${PROJECT_NAME} cairo RAPID)
+target_link_libraries(${PROJECT_NAME} cairo RAPID flann lz4)
 
