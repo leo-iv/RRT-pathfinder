@@ -1,13 +1,15 @@
-#include "model_2D.hpp"
+
+#include "graph.hpp"
 #include "renderer.hpp"
 #include <cmath>
 #include <iostream>
+#include <vector>
 
-int main() {
+void graphics_test() {
     Color blue = {0, 0, 255};
     Color green = {0, 255, 0};
     Color white = {255, 255, 255};
-    
+
     std::vector<Triangle_2D> model1_tri;
     model1_tri.push_back({Point_2D(-0.5, 0.0), Point_2D(0.5, 0.0), Point_2D(0.0, 0.5)});
     model1_tri.push_back({Point_2D(-0.5, 0.0), Point_2D(-0.5, 1.0), Point_2D(0.0, 0.5)});
@@ -29,3 +31,5 @@ int main() {
     renderer.draw_model(model2);
     renderer.save_to_png("output.png");
 }
+
+int main() { graphics_test(); }

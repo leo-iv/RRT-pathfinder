@@ -11,10 +11,11 @@ find_package(FLANN REQUIRED)
 
 include_directories(${CMAKE_SOURCE_DIR}/libs/rapid/include 
                     ${FLANN_INCLUDE_DIRS}
-                    ${CMAKE_SOURCE_DIR}/src/graphics)
+                    ${CMAKE_SOURCE_DIR}/src/graphics
+                    ${CMAKE_SOURCE_DIR}/src/rrt)
 link_directories(${CMAKE_SOURCE_DIR}/libs/rapid/)
 
-file(GLOB sources src/*.cpp src/graphics/*.cpp)
+file(GLOB sources src/*.cpp src/graphics/*.cpp src/graphics/*.hpp src/rrt/*.cpp src/rrt/*.hpp)
 add_executable(${PROJECT_NAME} ${sources})
 
 target_link_libraries(${PROJECT_NAME} cairo RAPID flann lz4)

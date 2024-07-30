@@ -1,7 +1,6 @@
 #include "model_2D.hpp"
 
 #include <cmath>
-#include <iostream> // TODO: DELETE
 
 Model_2D::Model_2D(const std::vector<Triangle_2D> &triangles, const Color &color) : triangles(triangles), color(color) {
     // initializing RAPID model for collision detection
@@ -47,7 +46,6 @@ void Model_2D::move(double x, double y, double angle) {
 bool Model_2D::collides_with(Model_2D &other_model) {
     RAPID_Collide(rot_matrix, translation_vec, rapid_model.get(), other_model.rot_matrix, other_model.translation_vec,
                   other_model.rapid_model.get());
-    std::cout << "Num of contacts: " << RAPID_num_contacts << std::endl;
     return RAPID_num_contacts != 0;
 }
 
