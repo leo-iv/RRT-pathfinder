@@ -32,7 +32,7 @@ Graph<dimension> &RRT_solver<dimension>::build_tree(std::list<std::array<double,
         std::vector<std::array<double, dimension>> new_states;
         bool path_is_collision_free = get_free_states(new_states, nearest_vertex->coords, random_state, delta);
 
-        if (((i % GOAL_INSERTION_ITER) == 0) && path_is_collision_free) { // adding gola state and path to it is free
+        if (((i % GOAL_INSERTION_ITER) == 0) && path_is_collision_free) { // adding goal state and path to it is free
             quit = true; // goal state reached -> quitting in the next iter
         }
 

@@ -6,7 +6,7 @@
 #include <random>
 
 /**
- * Interface class to privide the rrt algorithm with a collision detection method
+ * Interface class to provide the rrt algorithm with a collision detection method
  */
 class Collision_detector {
   public:
@@ -37,7 +37,7 @@ template <int dimension> class RRT_solver {
     /**
      * @param boundaries array with 'dimension' rows and 2 columns containing lower (first) and upper (second) bounds
      * for each of the coordinates in the configuration space
-     * @param detector imeplmentation of the Collision_detector interface
+     * @param detector implementation of the Collision_detector interface
      */
     RRT_solver(const std::array<std::array<double, 2>, dimension> &boundaries, Collision_detector *detector);
 
@@ -45,10 +45,10 @@ template <int dimension> class RRT_solver {
      * Constructs the RRT tree and finds permissible plan
      * @param start_state starting position from which the RRT tree is built
      * @param goal_state goal position to which we need to find path to
-     * @param iters number of iterations of the RRT algorithm
+     * @param iters maximal number of iterations of the RRT algorithm
      * @param delta distance between tree nodes for which the collision is checked (lower value is better, but runs
      * slower and needs more memory)
-     * @return reference to the construted graph (reference to graph stored inside the class - accesible only for the
+     * @return reference to the constructed graph (reference to graph stored inside the class - accessible only for the
      * lifespan of the RRT_Solver class)
      */
     Graph<dimension> &build_tree(std::list<std::array<double, dimension>> &result_plan,

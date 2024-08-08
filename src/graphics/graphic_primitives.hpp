@@ -1,6 +1,6 @@
 #pragma once
 /**
- * Collection of basic graphic primitives (such as points, colors, ...)
+ * Collection of basic graphics primitives (such as points, colors, ...)
  */
 
 #include <cstdint>
