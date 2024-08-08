@@ -1,6 +1,6 @@
 #pragma once
 /**
- * Collection of basic graphic primitives (such as points, colors, ...)
+ * Collection of basic graphics primitives (such as points, colors, ...)
  */
 
 #include <cstdint>
@@ -21,6 +21,8 @@ struct Point_2D {
 
 struct Color {
     uint8_t R, G, B;
+
+    Color(uint8_t R, uint8_t G, uint8_t B) : R(R), G(G), B(B) {}
 };
 
 struct Triangle_2D {
