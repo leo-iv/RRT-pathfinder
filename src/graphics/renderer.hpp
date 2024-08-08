@@ -3,7 +3,9 @@
 #include <cairo/cairo.h>
 #include <vector>
 
+#include "graph.hpp"
 #include "model_2D.hpp"
+#include "msf_gif.h"
 
 /**
  * Wrapper class for the cairo graphic library.
@@ -16,6 +18,9 @@ class Renderer {
     int image_width, image_height;
     double world_width, world_height;
 
+    // msg_gif support:
+    MsfGifState gif_state;
+
   public:
     Renderer() = delete;
     Renderer(int image_width, int image_height, double world_width, double world_height);
@@ -24,8 +29,19 @@ class Renderer {
     void fill(const Color &color);
     /** Draws model to the current image */
     void draw_model(const Model_2D &model);
+    void draw_line(const Point_2D &from, const Point_2D &to, const Color &color, double width);
+    /** Draws a circular point*/
+    void draw_point(const Point_2D &point, double radius, const Color &color);
     /** Saves the current image state to png file */
     void save_to_png(const char *file_name);
+
+    /** Initializes an empty gif.*/
+    void start_gif();
+    /** Adds current picture surface to the gif. start_gif() needs to be called before this method can be safely
+     * called*/
+    void add_to_gif(int centi_seconds);
+    /** Creates the result gif file and frees msf_gif data*/
+    void save_gif(const char *filename);
 
   private:
     void draw_triangle_path(const Triangle_2D &triangle);

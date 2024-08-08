@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <flann/flann.hpp>
 #include <list>
 #include <string.h>
@@ -14,51 +15,63 @@ template <int dimension> class Graph {
   public:
     struct Vertex {
         int id;
-        double coords[dimension];
+        std::array<double, dimension> coords;
+        Vertex *parent;
         std::list<std::pair<Vertex *, double>> edges; // outgoing edges with weights
 
-        Vertex(int id, double coords[dimension]) : id(id) {
-            memcpy(this->coords, coords, dimension * sizeof(this->coords[0]));
+        Vertex(const std::array<double, dimension> &coords, Vertex *parent) : coords(coords), parent(parent) {
+            id = last_vertex_id++;
         }
     };
 
-  private:
-    int last_id = 0;
+  public:
+    static int last_vertex_id;
     std::vector<Vertex *> vertices;
-    flann::Index<flann::L2<double>> index;
+    flann::Index<flann::L2<double>> index; // index for nearest neighbour search
 
   public:
-    Graph(double root_coords[dimension]) : index(flann::KDTreeIndexParams(4)) {
+    Graph(const Graph &) = delete;
+    Graph &operator=(const Graph &) = delete;
+
+    Graph() : index(flann::KDTreeIndexParams(4)) {}
+
+    Graph(std::array<double, dimension> &root_coords) : index(flann::KDTreeIndexParams(4)) {
         // building flann index:
-        flann::Matrix<double> point_matrix(root_coords, 1, dimension);
+        flann::Matrix<double> point_matrix(root_coords.data(), 1, dimension);
         index.buildIndex(point_matrix);
 
-        Vertex *root = new Vertex(last_id, root_coords);
+        Vertex *root = new Vertex(root_coords);
         vertices.push_back(root);
-        last_id++;
     }
 
     ~Graph() {
-        for (Vertex *vertex : vertices) {
-            delete vertex;
+        for (size_t i = 0; i < vertices.size(); i++) {
+            delete vertices[i];
         }
     }
 
-    Vertex *add_vertex(double coords[dimension]) {
-        // adding to flann index
-        flann::Matrix<double> point_matrix(coords, 1, dimension);
-        index.addPoints(point_matrix);
+    Vertex *add_vertex(std::array<double, dimension> &coords, Vertex *parent) {
+        if (vertices.empty()) {
+            // building new flann index for the first vertex
+            flann::Matrix<double> point_matrix(coords.data(), 1, dimension);
+            index.buildIndex(point_matrix);
+        } else {
+            // otherwise adding to existing flann index
+            flann::Matrix<double> point_matrix(coords.data(), 1, dimension);
+            index.addPoints(point_matrix, 2);
+        }
 
         // crating new vertex
-        Vertex *new_vertex = new Vertex(last_id, coords);
+        Vertex *new_vertex = new Vertex(coords, parent);
         vertices.push_back(new_vertex);
-        last_id++;
 
         return new_vertex;
     }
 
-    Vertex *get_nearest(double query_coords[dimension]) {
-        flann::Matrix<double> query_point(query_coords, 1, dimension);
+    Vertex *add_vertex(std::array<double, dimension> &coords) { return add_vertex(coords, nullptr); }
+
+    Vertex *get_nearest(std::array<double, dimension> query_coords) {
+        flann::Matrix<double> query_point(query_coords.data(), 1, dimension);
 
         std::vector<std::vector<int>> indices;
         std::vector<std::vector<double>> dists;
@@ -67,7 +80,21 @@ template <int dimension> class Graph {
         return vertices[indices[0][0]];
     }
 
+    /**
+     * Returns the last added vertex to the graph.
+     */
+    Vertex *get_last() { return vertices.back(); }
+
     void add_edge(Vertex *from, Vertex *to, double weight) {
         from->edges.push_back(std::pair<Vertex *, double>(to, weight));
     }
+
+    Vertex *get_root() const {
+        if (vertices.size() >= 1) {
+            return vertices[0];
+        }
+        return nullptr;
+    }
 };
+
+template <int dimension> int Graph<dimension>::last_vertex_id = 0;

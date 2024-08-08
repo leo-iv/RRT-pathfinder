@@ -21,6 +21,8 @@ struct Point_2D {
 
 struct Color {
     uint8_t R, G, B;
+
+    Color(uint8_t R, uint8_t G, uint8_t B) : R(R), G(G), B(B) {}
 };
 
 struct Triangle_2D {
