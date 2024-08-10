@@ -18,10 +18,15 @@ class Collision_detector {
     virtual bool check_collision(double state[]) = 0;
 };
 
+/**
+ * @brief Wrapper object for the rrt algorithm
+ *
+ * @tparam dimension - number of dimensions of the configuration space
+ */
 template <int dimension> class RRT_solver {
   private:
     // for every GOAL_INSERTION_ITER iteratio the RRT algorithm tries to insert the goal state into the tree
-    static constexpr int GOAL_INSERTION_ITER = 10;
+    static constexpr int GOAL_INSERTION_ITER = 15;
 
     Graph<dimension> graph;
     // lower and upper bounds for each of the coordinates in the configuration space - 2D array: [dimension][2]
@@ -61,7 +66,8 @@ template <int dimension> class RRT_solver {
      * even the goal state is collision free (is also added to the new_states vector).*/
     bool get_free_states(std::vector<std::array<double, dimension>> &new_states, std::array<double, dimension> &start,
                          std::array<double, dimension> &stop, double delta);
-    void construct_result_plan(std::list<std::array<double, dimension>> &result_plan, Graph<dimension>::Vertex* goal_vertex);
+    void construct_result_plan(std::list<std::array<double, dimension>> &result_plan,
+                               Graph<dimension>::Vertex *goal_vertex);
 };
 
 #include "rrt.tpp"

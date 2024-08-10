@@ -25,4 +25,66 @@ void test1() {
     env.run(start_state, goal_state, 10000, 1.0);
 }
 
-int main() { test1(); }
+void test2() {
+    std::vector<Triangle_2D> robot;
+    robot.push_back({Point_2D(-6, -1.5), Point_2D(6, -1.5), Point_2D(-6, 1.5)});
+    robot.push_back({Point_2D(6, 1.5), Point_2D(6, -1.5), Point_2D(-6, 1.5)});
+    robot.push_back({Point_2D(-9, -6), Point_2D(-6, -6), Point_2D(-9, 6)});
+    robot.push_back({Point_2D(-6, 6), Point_2D(-6, -6), Point_2D(-9, 6)});
+    robot.push_back({Point_2D(9, 6), Point_2D(6, 6), Point_2D(9, -6)});
+    robot.push_back({Point_2D(6, -6), Point_2D(6, 6), Point_2D(9, -6)});
+
+
+    Environment env(std::string("test2"), robot, 100.0, 50.0);
+    env.set_start_and_goal_width(20);
+    env.set_graph_width(6, 6);
+
+    env.add_rect_obstacle(3, 20, 30, 52, 0);
+    env.add_rect_obstacle(3, 30, 30, 12, 0);
+
+    env.add_rect_obstacle(3, 20, 60, -2, 0);
+    env.add_rect_obstacle(3, 32, 60, 40, 0);
+
+    std::array<double, 3> start_state = {8.0, 25.0, M_PI_2};
+    std::array<double, 3> goal_state = {92.0, 25.0, M_PI_2};
+    env.run(start_state, goal_state, 10000, 1.0);
+}
+
+void test3() {
+    std::vector<Triangle_2D> robot;
+    robot.push_back({Point_2D(-4.5, -1.125), Point_2D(4.5, -1.125), Point_2D(-4.5, 1.125)});
+    robot.push_back({Point_2D(4.5, 1.125), Point_2D(4.5, -1.125), Point_2D(-4.5, 1.125)});
+    robot.push_back({Point_2D(-6.75, -4.5), Point_2D(-4.5, -4.5), Point_2D(-6.75, 4.5)});
+    robot.push_back({Point_2D(-4.5, 4.5), Point_2D(-4.5, -4.5), Point_2D(-6.75, 4.5)});
+    robot.push_back({Point_2D(6.75, 4.5), Point_2D(4.5, 4.5), Point_2D(6.75, -4.5)});
+    robot.push_back({Point_2D(4.5, -4.5), Point_2D(4.5, 4.5), Point_2D(6.75, -4.5)});
+
+
+    Environment env(std::string("test3"), robot, 100.0, 50.0);
+    env.set_start_and_goal_width(20);
+    env.set_graph_width(6, 6);
+
+    env.add_rect_obstacle(100, 1, 50, 50, 0);
+    env.add_rect_obstacle(100, 1, 50, 0, 0);
+    env.add_rect_obstacle(1, 50, 0, 25, 0);
+    env.add_rect_obstacle(1, 50, 100, 25, 0);
+
+    env.add_rect_obstacle(3, 22, 32, 25, 0);
+    env.add_rect_obstacle(3, 16, 25.5, 36, M_PI_2);
+    env.add_rect_obstacle(3, 16, 25.5, 14, M_PI_2);
+
+    env.add_obstacle({{Point_2D(-6.0, 0.0), Point_2D(6.0, 0.0), Point_2D(6.0, 10.0)}}, 60, 30, 0.2);
+    env.add_obstacle({{Point_2D(-5.0, 0.0), Point_2D(5.0, 0.0), Point_2D(5.0, 9.0)}}, 58, 7, 2.0);
+    env.add_obstacle({{Point_2D(-7.0, 0.0), Point_2D(7.0, 0.0), Point_2D(0.0, 7.0)}}, 75, 15, 2.0);
+    env.add_obstacle({{Point_2D(-4.0, 0.0), Point_2D(4.0, 0.0), Point_2D(0.0, 4.0)}}, 80, 40, 0.0);
+
+    std::array<double, 3> start_state = {24.0, 25.0, M_PI_2};
+    std::array<double, 3> goal_state = {92.0, 25.0, M_PI_2};
+    env.run(start_state, goal_state, 10000, 1.0);
+}
+
+int main() {
+    test1();
+    test2();
+    test3();
+}

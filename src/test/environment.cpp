@@ -4,7 +4,7 @@ Environment::Environment(const std::string &name, const std::vector<Triangle_2D>
                          double height)
     : name(name), robot(robot_model, ROBOT_COLOR), width(width), height(height),
       renderer(IMAGE_WIDTH, IMAGE_WIDTH * (height / width), width, height),
-      rrt({{{0.0, width}, {0.0, height}, {0.0, M_PI}}}, this) {}
+      rrt({{{0.0, width}, {0.0, height}, {0.0, 2 * M_PI}}}, this) {}
 
 Environment::~Environment() {
     for (Model_2D *obstacle : obstacles) {
@@ -64,9 +64,9 @@ void Environment::create_result_animation(std::list<std::array<double, 3>> &resu
     for (auto &state : result_plan) {
         robot.move(state[0], state[1], state[2]);
         draw_env(start, goal);
-        renderer.add_to_gif(10);
+        renderer.add_to_gif(ANIM_SPEED);
     }
-    renderer.save_gif((name + ".gif").c_str());
+    renderer.save_gif((name + "_anim.gif").c_str());
 }
 
 bool Environment::check_collision(double state[]) {
@@ -79,6 +79,15 @@ bool Environment::check_collision(double state[]) {
 
     return true;
 }
+
+void Environment::set_start_and_goal_width(double width) { START_GOAL_WIDTH = width; }
+
+void Environment::set_graph_width(double vertex_radius, double line_width) {
+    VERTEX_WIDTH = vertex_radius;
+    GRAPH_WIDTH = line_width;
+}
+
+void Environment::set_anim_speed(int centi_seconds) { ANIM_SPEED = centi_seconds; }
 
 void Environment::draw_tree_hlp(const Graph<3>::Vertex *root) {
     for (const std::pair<Graph<3>::Vertex *, double> &edge : root->edges) {

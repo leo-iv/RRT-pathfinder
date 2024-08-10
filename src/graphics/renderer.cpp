@@ -7,7 +7,6 @@ Renderer::Renderer(int image_width, int image_height, double world_width, double
     : image_width(image_width), image_height(image_height), world_width(world_width), world_height(world_height) {
     surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, image_width, image_height);
     cr = cairo_create(surface);
-    cairo_scale(cr, image_width, image_height); // scaling to 1.0 x 1.0 coordinate space
 }
 
 Renderer::~Renderer() {
@@ -85,8 +84,9 @@ void Renderer::draw_triangle_path(const Triangle_2D &triangle) {
 }
 
 /**
- * Transforms point from user (model) coordinate system to cairos 1.0x1.0 coordinate system
+ * Transforms point from user (model) coordinate system to cairos coordinate system
  */
 Point_2D Renderer::transform_point(const Point_2D &point) {
-    return Point_2D(point.get_x() / world_width, (world_height - point.get_y()) / world_height);
+    return Point_2D((point.get_x() / world_width) * image_width,
+                    ((world_height - point.get_y()) / world_height) * image_height);
 }

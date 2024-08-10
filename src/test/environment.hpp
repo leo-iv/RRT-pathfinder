@@ -16,9 +16,10 @@ class Environment : public Collision_detector {
     const Color RESULT_COLOR = {225, 163, 111};
     const Color START_COLOR = {225, 163, 111};
     const Color GOAL_COLOR = {225, 163, 111};
-    static constexpr double START_GOAL_WIDTH = 0.02;
-    static constexpr double GRAPH_WIDTH = 0.005;
-    static constexpr double VERTEX_WIDTH = 0.005;
+    double START_GOAL_WIDTH = 30;
+    double GRAPH_WIDTH = 10;
+    double VERTEX_WIDTH = 10;
+    int ANIM_SPEED = 10; // in centi seconds
 
     std::string name; // name for this environment
 
@@ -40,9 +41,14 @@ class Environment : public Collision_detector {
     void add_obstacle(const std::vector<Triangle_2D> &model, double x, double y, double angle);
     /** Adds rectangular obstacle to the environment. */
     void add_rect_obstacle(double width, double height, double x, double y, double angle);
+    /** Runs tests. */
     void run(std::array<double, 3> &start, std::array<double, 3> &goal, int iters, double delta);
-
     bool check_collision(double state[]) override; // override from Collsion_detector interface
+
+    /** Customization of visualization parameters */
+    void set_start_and_goal_width(double width);
+    void set_graph_width(double vertex_radius, double line_width);
+    void set_anim_speed(int centi_seconds);
 
   private:
     void draw_result(std::list<std::array<double, 3>> &result_plan);
