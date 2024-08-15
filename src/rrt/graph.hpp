@@ -18,9 +18,16 @@ template <int dimension> class Graph {
         std::array<double, dimension> coords;
         Vertex *parent;
         std::list<std::pair<Vertex *, double>> edges; // outgoing edges with weights
+        double cost; // total cost of the path from the root of the graph to this vertex
 
-        Vertex(const std::array<double, dimension> &coords, Vertex *parent) : coords(coords), parent(parent) {
+        Vertex(const std::array<double, dimension> &coords, Vertex *parent, double edge_weight_from_parent)
+            : coords(coords), parent(parent) {
             id = last_vertex_id++;
+            if (parent == nullptr) {
+                cost = 0;
+            } else {
+                cost = parent->cost + edge_weight_from_parent;
+            }
         }
     };
 
@@ -50,7 +57,7 @@ template <int dimension> class Graph {
         }
     }
 
-    Vertex *add_vertex(std::array<double, dimension> &coords, Vertex *parent) {
+    Vertex *add_vertex(std::array<double, dimension> &coords, Vertex *parent, double weight) {
         if (vertices.empty()) {
             // building new flann index for the first vertex
             flann::Matrix<double> point_matrix(coords.data(), 1, dimension);
@@ -62,18 +69,51 @@ template <int dimension> class Graph {
         }
 
         // crating new vertex
-        Vertex *new_vertex = new Vertex(coords, parent);
+        Vertex *new_vertex = new Vertex(coords, parent, weight);
         vertices.push_back(new_vertex);
 
         return new_vertex;
     }
 
-    Vertex *add_vertex(std::array<double, dimension> &coords) { return add_vertex(coords, nullptr); }
+    Vertex *add_vertex(std::array<double, dimension> &coords) { return add_vertex(coords, nullptr, 0); }
+
+    void add_edge(Vertex *from, Vertex *to, double weight) {
+        from->edges.push_back(std::pair<Vertex *, double>(to, weight));
+    }
+
+    void remove_edge(Vertex *from, Vertex *to) {
+        for (typename std::list<std::pair<Vertex *, double>>::iterator it = from->edges.begin();
+             it != from->edges.end();) {
+            if ((*it).first == to) {
+                from->edges.erase(it);
+                break;
+            }
+            it++;
+        }
+    }
+
+    void rewire_vertex(Vertex *vertex, Vertex *new_parent, double new_edge_weight) {
+        if (vertex->parent != nullptr) {
+            remove_edge(vertex->parent, vertex);
+        }
+        vertex->parent = new_parent;
+        add_edge(new_parent, vertex, new_edge_weight);
+        vertex->cost = new_parent->cost + new_edge_weight;
+    }
+
+    /**
+     * Adds new vertex to the graph together with the edge from the parent vertex
+     */
+    Vertex *connect_new_vertex(std::array<double, dimension> &coords, Vertex *parent, double weight) {
+        Vertex *new_vertex = add_vertex(coords, parent, weight);
+        add_edge(parent, new_vertex, weight);
+        return new_vertex;
+    }
 
     /**
      * Returns nearest vertex (in standard Euclidean distance) to the query configuration.
      */
-    Vertex *get_nearest(std::array<double, dimension> query_coords) {
+    Vertex *get_nearest(std::array<double, dimension> &query_coords) {
         flann::Matrix<double> query_point(query_coords.data(), 1, dimension);
 
         std::vector<std::vector<int>> indices;
@@ -84,13 +124,32 @@ template <int dimension> class Graph {
     }
 
     /**
+     * Returns (via std::vector reference) k nearest vertices (in standard Euclidean distance) to the query
+     * configuration.
+     */
+    void get_k_nearest(std::vector<Vertex *> &k_nearest, std::array<double, dimension> &query_coords, size_t k) {
+        if (k <= 0) {
+            return;
+        }
+
+        if (k > vertices.size()) {
+            k = vertices.size() - 1;
+        }
+        flann::Matrix<double> query_point(query_coords.data(), 1, dimension);
+
+        std::vector<std::vector<int>> indices;
+        std::vector<std::vector<double>> dists;
+        int found = index.knnSearch(query_point, indices, dists, k, flann::SearchParams(128));
+
+        for (int i = 0; i < found; i++) {
+            k_nearest.push_back(vertices[indices[0][i]]);
+        }
+    }
+
+    /**
      * Returns the last added vertex to the graph.
      */
     Vertex *get_last() { return vertices.back(); }
-
-    void add_edge(Vertex *from, Vertex *to, double weight) {
-        from->edges.push_back(std::pair<Vertex *, double>(to, weight));
-    }
 
     /**
      * Returns the first added vertex to the graph.
@@ -101,6 +160,22 @@ template <int dimension> class Graph {
         }
         return nullptr;
     }
+
+    /**
+     * Removes all verticies and edges from the graph.
+     */
+    void clear() {
+        for (size_t i = 0; i < vertices.size(); i++) {
+            delete vertices[i];
+        }
+        vertices.clear();
+        index = flann::Index<flann::L2<double>>(flann::KDTreeIndexParams(4)); // creating new index
+    }
+
+    /**
+     * Returns the number of verticies in the graph
+     */
+    size_t size() { return vertices.size(); }
 };
 
 template <int dimension> int Graph<dimension>::last_vertex_id = 0;
