@@ -82,6 +82,7 @@ template <int dimension> class RRT_solver {
 
   private:
     std::array<double, dimension> get_random_state();
+    std::array<double, dimension> get_random_free_state();
     /** Finds all free configurations between start and stop by by moving an incremental distance delta. Returns true if
      * even the goal state is collision free (is also added to the new_states vector).*/
     bool get_free_states(std::vector<std::array<double, dimension>> &new_states, std::array<double, dimension> &start,
@@ -92,7 +93,7 @@ template <int dimension> class RRT_solver {
     /**  Returns state in the step_size distance from start in the given direction. If distance from start to direction
      * state is lower than step_size, then direction is returned.*/
     std::array<double, dimension> move_a_step(std::array<double, dimension> &start,
-                                              std::array<double, dimension> &direction, double step_size);
+                                              std::array<double, dimension> &direction, double step_size, double delta);
     void construct_result_plan(std::list<std::array<double, dimension>> &result_plan,
                                Graph<dimension>::Vertex *goal_vertex);
     /** Constructs result plan, but also splits all edges so the disance between vertices is delta at maximum */

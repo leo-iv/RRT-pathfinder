@@ -19,7 +19,7 @@ void test0() {
 
     std::array<double, 3> start_state = {8.0, 25.0, 0.0};
     std::array<double, 3> goal_state = {42.0, 25.0, 0.0};
-    env.run(start_state, goal_state, 500, 500, 2.0, 1.0);
+    env.run(start_state, goal_state, 500, 500, 5.0, 1.0);
 }
 
 void test1() {
@@ -44,7 +44,7 @@ void test1() {
 
     std::array<double, 3> start_state = {8.0, 8.0, 0.0};
     std::array<double, 3> goal_state = {10.0, 40.0, 0.0};
-    env.run(start_state, goal_state, 50000, 10000, 1.0, 1.0);
+    env.run(start_state, goal_state, 50000, 10000, 10.0, 1.0);
 }
 
 void test2() {
@@ -68,7 +68,7 @@ void test2() {
 
     std::array<double, 3> start_state = {8.0, 25.0, M_PI_2};
     std::array<double, 3> goal_state = {92.0, 25.0, M_PI_2};
-    env.run(start_state, goal_state, 50000, 10000, 2.0, 1.0);
+    env.run(start_state, goal_state, 50000, 10000, 10.0, 1.0);
 }
 
 void test3() {
@@ -100,7 +100,7 @@ void test3() {
 
     std::array<double, 3> start_state = {24.0, 25.0, M_PI_2};
     std::array<double, 3> goal_state = {92.0, 25.0, M_PI_2};
-    env.run(start_state, goal_state, 50000, 10000, 2.0, 1.0);
+    env.run(start_state, goal_state, 50000, 1000, 10.0, 0.5);
 }
 
 int main() {

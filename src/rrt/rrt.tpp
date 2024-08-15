@@ -61,9 +61,9 @@ void RRT_solver<dimension>::solve_k_rrts(std::list<std::array<double, dimension>
     graph.add_vertex(start_state);
 
     for (int i = 0; i < iters; i++) {
-        std::array<double, dimension> random_state = get_random_state();
+        std::array<double, dimension> random_state = get_random_free_state();
         auto nearest = graph.get_nearest(random_state);
-        std::array<double, dimension> new_state = move_a_step(nearest->coords, random_state, step);
+        std::array<double, dimension> new_state = move_a_step(nearest->coords, random_state, step, delta);
 
         if (is_collision_free(nearest->coords, new_state, delta)) {
             int k = (int)(2 * M_E * std::log(graph.size())); // number of nearest neighbours
@@ -123,6 +123,15 @@ template <int dimension> std::array<double, dimension> RRT_solver<dimension>::ge
     return state;
 }
 
+template <int dimension> std::array<double, dimension> RRT_solver<dimension>::get_random_free_state() {
+    while (true) {
+        std::array<double, dimension> state = get_random_state();
+        if (detector->check_collision(state.data())) {
+            return state;
+        }
+    }
+}
+
 template <int dimension>
 bool RRT_solver<dimension>::get_free_states(std::vector<std::array<double, dimension>> &new_states,
                                             std::array<double, dimension> &start, std::array<double, dimension> &stop,
@@ -179,15 +188,21 @@ bool RRT_solver<dimension>::is_collision_free(std::array<double, dimension> &sta
 template <int dimension>
 std::array<double, dimension> RRT_solver<dimension>::move_a_step(std::array<double, dimension> &start,
                                                                  std::array<double, dimension> &direction,
-                                                                 double step_size) {
+                                                                 double step_size, double delta) {
     std::array<double, dimension> diff = vector_diff(direction, start);
     double distance = vector_norm(diff);
-    if (distance <= step_size) {
+    if (distance <= delta) {
         return direction;
     }
-
     diff = vector_mult(1.0 / distance, diff); // normalizing to 1.0 norm
-    return vector_add(start, vector_mult(step_size, diff));
+    auto stop = vector_add(start, vector_mult(step_size, diff));
+
+    std::vector<std::array<double, dimension>> new_states;
+    get_free_states(new_states, start, stop, delta);
+    if (new_states.size() <= 0) {
+        return direction;
+    }
+    return new_states.back();
 }
 
 template <int dimension>
