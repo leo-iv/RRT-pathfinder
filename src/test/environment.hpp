@@ -32,7 +32,7 @@ class Environment : public Collision_detector {
 
     Renderer renderer;
 
-    RRT_solver<3> rrt;
+    RRT_solver<3> solver;
 
   public:
     Environment(const std::string &name, const std::vector<Triangle_2D> &robot_model, double width, double height);
@@ -42,7 +42,8 @@ class Environment : public Collision_detector {
     /** Adds rectangular obstacle to the environment. */
     void add_rect_obstacle(double width, double height, double x, double y, double angle);
     /** Runs tests. */
-    void run(std::array<double, 3> &start, std::array<double, 3> &goal, int iters, double delta);
+    void run(std::array<double, 3> &start, std::array<double, 3> &goal, int rrt_iters, int rrts_iters, double rrts_step,
+             double delta);
     bool check_collision(double state[]) override; // override from Collsion_detector interface
 
     /** Customization of visualization parameters */
@@ -52,7 +53,7 @@ class Environment : public Collision_detector {
 
   private:
     void draw_result(std::list<std::array<double, 3>> &result_plan);
-    void create_result_animation(std::list<std::array<double, 3>> &result_plan);
+    void create_result_animation(std::list<std::array<double, 3>> &result_plan, std::string file_name);
     void draw_tree(const Graph<3> &graph);
     void draw_tree_hlp(const Graph<3>::Vertex *root);
     void draw_env(std::array<double, 3> &start, std::array<double, 3> &goal);

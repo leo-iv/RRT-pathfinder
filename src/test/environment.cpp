@@ -4,7 +4,7 @@ Environment::Environment(const std::string &name, const std::vector<Triangle_2D>
                          double height)
     : name(name), robot(robot_model, ROBOT_COLOR), width(width), height(height),
       renderer(IMAGE_WIDTH, IMAGE_WIDTH * (height / width), width, height),
-      rrt({{{0.0, width}, {0.0, height}, {0.0, 2 * M_PI}}}, this) {}
+      solver({{{0.0, width}, {0.0, height}, {0.0, 2 * M_PI}}}, this) {}
 
 Environment::~Environment() {
     for (Model_2D *obstacle : obstacles) {
@@ -27,22 +27,43 @@ void Environment::add_rect_obstacle(double width, double height, double x, doubl
     add_obstacle(rect, x, y, angle);
 }
 
-void Environment::run(std::array<double, 3> &start, std::array<double, 3> &goal, int iters, double delta) {
+void Environment::run(std::array<double, 3> &start, std::array<double, 3> &goal, int rrt_iters, int rrts_iters,
+                      double rrts_step, double delta) {
     robot.move(start[0], start[1], start[2]); // move robot to starting position
     draw_env(start, goal);
-    renderer.save_to_png((name + std::string(".png")).c_str());
+    renderer.save_to_png((name + ".png").c_str());
 
-    std::list<std::array<double, 3>> result_plan;
-    Graph<3> &graph = rrt.build_tree(result_plan, start, goal, iters, delta);
+    // test rrt:
+    std::list<std::array<double, 3>> result_plan_rrt;
+    solver.solve_rrt(result_plan_rrt, start, goal, rrt_iters, delta);
+    Graph<3> &graph_rrt = solver.get_tree();
 
-    draw_tree(graph); // drawing edges
-    renderer.save_to_png((name + std::string("_tree.png")).c_str());
+    draw_tree(graph_rrt);
+    renderer.save_to_png((name + "_rrt_tree.png").c_str());
 
-    if (!result_plan.empty()) {
-        draw_result(result_plan);
-        renderer.save_to_png((name + std::string("_result.png")).c_str());
+    if (!result_plan_rrt.empty()) {
+        draw_result(result_plan_rrt);
+        renderer.save_to_png((name + "_rrt_result.png").c_str());
 
-        create_result_animation(result_plan);
+        create_result_animation(result_plan_rrt, name + "_rrt_anim.gif");
+    }
+
+    // test rrt*:
+    robot.move(start[0], start[1], start[2]); // move robot to starting position
+    draw_env(start, goal);
+
+    std::list<std::array<double, 3>> result_plan_rrts;
+    solver.solve_k_rrts(result_plan_rrts, start, goal, rrts_iters, rrts_step, delta);
+    Graph<3> &graph_rrts = solver.get_tree();
+
+    draw_tree(graph_rrts);
+    renderer.save_to_png((name + "_rrts_tree.png").c_str());
+
+    if (!result_plan_rrts.empty()) {
+        draw_result(result_plan_rrts);
+        renderer.save_to_png((name + "_rrts_result.png").c_str());
+
+        create_result_animation(result_plan_rrts, name + "_rrts_anim.gif");
     }
 }
 
@@ -56,7 +77,7 @@ void Environment::draw_result(std::list<std::array<double, 3>> &result_plan) {
     }
 }
 
-void Environment::create_result_animation(std::list<std::array<double, 3>> &result_plan) {
+void Environment::create_result_animation(std::list<std::array<double, 3>> &result_plan, std::string file_name) {
     auto &start = result_plan.front();
     auto &goal = result_plan.back();
 
@@ -66,7 +87,7 @@ void Environment::create_result_animation(std::list<std::array<double, 3>> &resu
         draw_env(start, goal);
         renderer.add_to_gif(ANIM_SPEED);
     }
-    renderer.save_gif((name + "_anim.gif").c_str());
+    renderer.save_gif(file_name.c_str());
 }
 
 bool Environment::check_collision(double state[]) {

@@ -1,5 +1,27 @@
 #include "environment.hpp"
 
+void test0() {
+    std::vector<Triangle_2D> robot;
+    robot.push_back({Point_2D(-3, 0), Point_2D(3, 0), Point_2D(0, 3)});
+    robot.push_back({Point_2D(-3, 0), Point_2D(-3, 6), Point_2D(0, 3)});
+    robot.push_back({Point_2D(3, 6), Point_2D(3, 0), Point_2D(0, 3)});
+    robot.push_back({Point_2D(-3, 0), Point_2D(3, 0), Point_2D(0, -3)});
+    robot.push_back({Point_2D(-3, 0), Point_2D(0, -3), Point_2D(-3, -6)});
+    robot.push_back({Point_2D(3, 0), Point_2D(3, -6), Point_2D(0, -3)});
+    robot.push_back({Point_2D(-3, 0), Point_2D(-3, 3), Point_2D(-6, 3)});
+    robot.push_back({Point_2D(-3, 0), Point_2D(-3, -3), Point_2D(-6, -3)});
+    robot.push_back({Point_2D(3, 0), Point_2D(3, -3), Point_2D(6, -3)});
+    robot.push_back({Point_2D(3, 0), Point_2D(3, 3), Point_2D(6, 3)});
+
+    Environment env(std::string("test0"), robot, 50.0, 50.0);
+
+    env.add_rect_obstacle(1.0, 10.0, 25, 25, 0);
+
+    std::array<double, 3> start_state = {8.0, 25.0, 0.0};
+    std::array<double, 3> goal_state = {42.0, 25.0, 0.0};
+    env.run(start_state, goal_state, 500, 500, 5.0, 1.0);
+}
+
 void test1() {
     std::vector<Triangle_2D> robot;
     robot.push_back({Point_2D(-3, 0), Point_2D(3, 0), Point_2D(0, 3)});
@@ -22,7 +44,7 @@ void test1() {
 
     std::array<double, 3> start_state = {8.0, 8.0, 0.0};
     std::array<double, 3> goal_state = {10.0, 40.0, 0.0};
-    env.run(start_state, goal_state, 10000, 1.0);
+    env.run(start_state, goal_state, 50000, 10000, 10.0, 1.0);
 }
 
 void test2() {
@@ -33,7 +55,6 @@ void test2() {
     robot.push_back({Point_2D(-6, 6), Point_2D(-6, -6), Point_2D(-9, 6)});
     robot.push_back({Point_2D(9, 6), Point_2D(6, 6), Point_2D(9, -6)});
     robot.push_back({Point_2D(6, -6), Point_2D(6, 6), Point_2D(9, -6)});
-
 
     Environment env(std::string("test2"), robot, 100.0, 50.0);
     env.set_start_and_goal_width(20);
@@ -47,7 +68,7 @@ void test2() {
 
     std::array<double, 3> start_state = {8.0, 25.0, M_PI_2};
     std::array<double, 3> goal_state = {92.0, 25.0, M_PI_2};
-    env.run(start_state, goal_state, 10000, 1.0);
+    env.run(start_state, goal_state, 50000, 10000, 10.0, 1.0);
 }
 
 void test3() {
@@ -58,7 +79,6 @@ void test3() {
     robot.push_back({Point_2D(-4.5, 4.5), Point_2D(-4.5, -4.5), Point_2D(-6.75, 4.5)});
     robot.push_back({Point_2D(6.75, 4.5), Point_2D(4.5, 4.5), Point_2D(6.75, -4.5)});
     robot.push_back({Point_2D(4.5, -4.5), Point_2D(4.5, 4.5), Point_2D(6.75, -4.5)});
-
 
     Environment env(std::string("test3"), robot, 100.0, 50.0);
     env.set_start_and_goal_width(20);
@@ -80,10 +100,11 @@ void test3() {
 
     std::array<double, 3> start_state = {24.0, 25.0, M_PI_2};
     std::array<double, 3> goal_state = {92.0, 25.0, M_PI_2};
-    env.run(start_state, goal_state, 10000, 1.0);
+    env.run(start_state, goal_state, 50000, 1000, 10.0, 1.0);
 }
 
 int main() {
+    test0();
     test1();
     test2();
     test3();
