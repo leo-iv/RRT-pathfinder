@@ -100,7 +100,7 @@ void test3() {
 
     std::array<double, 3> start_state = {24.0, 25.0, M_PI_2};
     std::array<double, 3> goal_state = {92.0, 25.0, M_PI_2};
-    env.run(start_state, goal_state, 50000, 1000, 10.0, 0.5);
+    env.run(start_state, goal_state, 50000, 1000, 10.0, 1.0);
 }
 
 int main() {
